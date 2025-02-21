@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, ValidationPipe } from '@nestjs/common';
 import { PetsService } from './pets.service';
 import { Pet } from './pets/pet.entity';
 import { CreatePetDto } from './pets/pet.dto';
@@ -13,13 +13,30 @@ export class PetsController {
   }
 
   @Get(':id')
-  findOne(id: string): Promise<Pet> {
-    return this.petsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Pet> {
+    try {
+      return await this.petsService.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`Could not find pet with ID ${id}`);
+    }
   }
 
-  @Post()
-  create(@Body(new ValidationPipe()) pet: CreatePetDto): Promise<Pet> {
-    return this.petsService.create(pet);
+  // update the isAdopted property of a pet 
+  @Post(':id/adopt')
+  async adoptPet(@Param('id') id: string): Promise<Pet> {
+    try {
+      return await this.petsService.adoptPet(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`Could not find pet with ID ${id}`);
+    }
   }
+
+
 
 }

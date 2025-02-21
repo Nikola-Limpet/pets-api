@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pet } from './pets/pet.entity';
@@ -12,20 +12,30 @@ export class PetsService {
   ) { }
 
   findAll(): Promise<Pet[]> {
-    return this.petsRepository.find();
+    return this.petsRepository.find({
+      relations: ['images'],
+      order: {
+        created_at: 'DESC'
+      }
+    });
   }
 
-  findOne(id: string): Promise<Pet> {
-    return this.petsRepository.findOne({ where: { id }, relations: ['images'] });
-  }
-  async create(createPetDto: CreatePetDto): Promise<Pet> {
-    const pet = this.petsRepository.create({
-      ...createPetDto,
-      images: createPetDto.images.map((url, index) => ({
-        url,
-        order: index + 1
-      }))
+  async findOne(id: string): Promise<Pet> {
+    const pet = await this.petsRepository.findOne({
+      where: { id },
+      relations: ['images'],
     });
-    return this.petsRepository.save(pet);
+
+    if (!pet) {
+      throw new NotFoundException(`Pet with ID ${id} not found`);
+    }
+
+    return pet;
+  }
+  adoptPet(id: string): Promise<Pet> {
+    return this.petsRepository.save({
+      id,
+      isAdopted: true,
+    });
   }
 }
