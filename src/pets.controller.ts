@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { PetsService } from './pets.service';
 import { Pet } from './pets/pet.entity';
 import { CreatePetDto } from './pets/pet.dto';
