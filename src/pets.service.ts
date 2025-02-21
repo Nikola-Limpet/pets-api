@@ -16,7 +16,7 @@ export class PetsService {
   }
 
   findOne(id: string): Promise<Pet> {
-    return this.petsRepository.findOne({ where: { id } });
+    return this.petsRepository.findOne({ where: { id }, relations: ['images'] });
   }
   async create(createPetDto: CreatePetDto): Promise<Pet> {
     const pet = this.petsRepository.create({

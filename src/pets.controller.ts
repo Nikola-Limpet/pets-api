@@ -12,6 +12,11 @@ export class PetsController {
     return this.petsService.findAll();
   }
 
+  @Get(':id')
+  findOne(id: string): Promise<Pet> {
+    return this.petsService.findOne(id);
+  }
+
   @Post()
   create(@Body(new ValidationPipe()) pet: CreatePetDto): Promise<Pet> {
     return this.petsService.create(pet);
