@@ -15,7 +15,7 @@ export class SeedService {
   async seed() {
     const count = await this.petsRepository.count();
 
-    if (count > 0) {
+    if (count > 2) {
       this.logger.log('Database has already been seeded');
       return;
     }
