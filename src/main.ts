@@ -9,10 +9,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  if (process.env.NODE_ENV !== 'production') {
-    const seedService = app.get(SeedService);
-    await seedService.seed();
-  }
+  const seedService = app.get(SeedService);
+  await seedService.seed();
 
   app.enableCors({
     origin: true,

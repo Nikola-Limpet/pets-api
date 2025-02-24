@@ -212,6 +212,13 @@ export class SeedService {
       }
     ];
 
+    await Promise.all(
+      pets.map(async (pet) => {
+        const newPet = this.petsRepository.create(pet);
+        await this.petsRepository.save(newPet);
+      })
+    );
+
     try {
       for (const pet of pets) {
         const newPet = this.petsRepository.create(pet);
