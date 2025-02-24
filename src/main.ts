@@ -2,13 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './pets.module';
 import { ConfigService } from '@nestjs/config';
 import { SeedService } from './seed/seed.service';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const seedService = app.get(SeedService);
-  await seedService.seed();
+
+  if (process.env.NODE_ENV !== 'production') {
+    const seedService = app.get(SeedService);
+    await seedService.seed();
+  }
 
   app.enableCors({
     origin: true,
@@ -20,5 +24,6 @@ async function bootstrap() {
 
   const port = configService.get('PORT') || 3000;
   await app.listen(port, '0.0.0.0'); // Listen on all network interfaces
+  logger.log(`Application is running on port ${port}`);
 }
 bootstrap();

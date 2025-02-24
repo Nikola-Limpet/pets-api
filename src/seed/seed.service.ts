@@ -1,16 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pet } from '../pets/pet.entity';
 
 @Injectable()
 export class SeedService {
+  private readonly logger = new Logger(SeedService.name);
   constructor(
     @InjectRepository(Pet)
+
     private petsRepository: Repository<Pet>,
   ) { }
 
   async seed() {
+    const count = await this.petsRepository.count();
+
+    if (count > 0) {
+      this.logger.log('Database has already been seeded');
+      return;
+    }
     const pets = [
       {
         name: 'Max',
@@ -120,7 +128,7 @@ export class SeedService {
         breed: "Cockatiel",
         age: 2,
         isAdopted: false,
-        image: "https://hari.ca/wp-content/uploads/2023/06/Pearl_Cockatiel.jpg",
+        image: "https://hari.ca/wp-content/uploads/2023/03/LutinoPearl_Cockatiel.jpg",
         images: [
           { url: 'https://hari.ca/wp-content/uploads/2023/06/Pearl_Cockatiel.jpg', order: 1 },
           { url: 'https://hari.ca/wp-content/uploads/2023/03/LutinoPearl_Cockatiel.jpg', order: 2 },
@@ -204,10 +212,14 @@ export class SeedService {
       }
     ];
 
-    for (const pet of pets) {
-      const newPet = this.petsRepository.create(pet);
-      await this.petsRepository.save(newPet);
+    try {
+      for (const pet of pets) {
+        const newPet = this.petsRepository.create(pet);
+        await this.petsRepository.save(newPet);
+      }
+      this.logger.log('Database seeded successfully!');
+    } catch (error) {
+      this.logger.error('Error seeding database:', error);
     }
-    console.log('Database seeded!');
   }
 }
